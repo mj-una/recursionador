@@ -7,94 +7,44 @@
 	<title>Recursionador</title>
 </head>
 <body>
-	<h1>Recursionador <small><small>version 0.1</small></small></h1>
-	<h2 id="subTitulo">==> archivo numero</h2>
+	<h1>Recursionador <small><small>version 0.2</small></small></h1>
+	<h2>==> archivo numero <span id="spanIndice"></span> <==</h2>
 	<button id="btnDescarga">Descargar</button>
 	<script>
 
-// id recursions
-const imprIndice = 0;
-const recurIndice = () => '${impr ? imprIndice + 1 : recurIndice()}';
+// id recursion
+const indice = 0;
 
 // actualizar subtitulo
-document.getElementById("subTitulo").innerText += (" " + imprIndice + " <==");
+document.getElementById("spanIndice").innerText = indice;
 
-// casos semilla
-const imprSemilla = () => '(impr) => (' + txtHtml(false) + ')';
-const recurSemilla = () => '${impr ? imprSemilla() : recurSemilla()}';
-
-// casos etiqueta
-const imprScript = () => '</scr' + 'ipt>';
-const recurScript = () => '${impr ? imprScript() : recurScript()}';
-
-// plantilla proxima recursion (nro 1)
-const txtHtml = (impr) => (String.raw
-`<!-- mj-una. al dominio publico. cc0. no es necesario citar autoria. -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Recursionador</title>
-</head>
-<body>
-	<h1>Recursionador <small><small>v0.1</small></small></h1>
-	<h2 id="subTitulo">==> archivo numero</h2>
-	<button id="btnDescarga">Descargar</button>
-	<script>
-
-// id recursion actual
-const imprIndice = ${impr ? imprIndice + 1 : recurIndice()};
-const recurIndice = ${"() => '${impr ? imprIndice + 1 : recurIndice()}'"};
-
-// actualizar subtitulo
-document.getElementById("subTitulo").innerText += (" " + imprIndice + " <==");
-
-// casos semilla
-const imprSemilla = ${impr ? () => '(impr) => (' + txtHtml(false) + ')' : recurSemilla()};
-const recurSemilla = ${"() => ${impr ? () => '(impr) => (' + txtHtml(false) + ')' : recurSemilla()}"};
-
-// casos etiqueta
-const imprScript = () => '</scr' + 'ipt>';
-const recurScript = () => '\${impr ? imprScript() : recurScript()}';
-
-// plantilla proxima recursion (nro ${impr ? imprIndice + 1 : imprIndice + 2})
-const txtHtml = ${impr ? imprSemilla() : recurSemilla()};
-
-// boton para descarga
+// click boton descarga
 document.getElementById("btnDescarga").addEventListener("click", () => {
 
-			// crea binario con el texto html
-			const blob = new Blob([txtHtml(true)], { type: "text/html" });
+	// obtener plantilla
+	const origiHtml = document.documentElement.outerHTML;
+	
+	// actualizar plantilla
+	const nuevoHtml = 
+	`<!-- mj-una. al dominio publico. cc0. no es necesario citar autoria. -->
+	<!DOCTYPE html>
+	` + origiHtml.replace(
+		`const indice = ${indice};`,
+		`const indice = ${indice + 1};`
+	);
 
-			// crea un enlace temporal para descargar blob
-			const enlaceTemp = document.createElement("a");
-			enlaceTemp.href = URL.createObjectURL(blob);
-			enlaceTemp.download = "recursion" + (imprIndice + 1) + ".html";
-			document.body.appendChild(enlaceTemp);
-			enlaceTemp.click(); // click de descarga (forzado)
+	// crea binario de plantilla
+	const blob = new Blob([nuevoHtml], { type: 'text/html' });
 
-			// elimina el enlace despues de la descarga
-			document.body.removeChild(enlaceTemp);
-		});
-	${impr ? imprScript() : recurScript()}
-</body>
-</html>`);
-
-// boton para descarga
-document.getElementById("btnDescarga").addEventListener("click", () => {
-
-	// crea binario con el texto html
-	const blob = new Blob([txtHtml(true)], { type: "text/html" });
-
-	// crea un enlace temporal para descargar blob
-	const enlaceTemp = document.createElement("a");
+	// enlace temporal para descargar blob
+	const enlaceTemp = document.createElement('a');
 	enlaceTemp.href = URL.createObjectURL(blob);
-	enlaceTemp.download = "recursion" + (imprIndice + 1) + ".html";
+	enlaceTemp.download = `recursion${indice + 1}.html`;
 	document.body.appendChild(enlaceTemp);
-	enlaceTemp.click(); // click de descarga (forzado)
+	enlaceTemp.click(); // accion descarga blob
 
 	// elimina el enlace despues de la descarga
+	URL.revokeObjectURL(enlaceTemp.href);
 	document.body.removeChild(enlaceTemp);
 });
 
